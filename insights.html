@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% set page_title = "AI Insights" %}
+
+{% block content %}
+  <div class="row g-3">
+    <div class="col-12 col-lg-4">
+      <div class="card card-glass p-3">
+        <div class="section-title mb-2">Performance snapshot</div>
+        <div class="text-secondary small mb-3">Based on your journaled trades.</div>
+        <div class="stack">
+          <div class="d-flex justify-content-between">
+            <span class="text-secondary">Total trades</span>
+            <span class="fw-semibold">{{ kpis.total_trades }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-secondary">Win rate</span>
+            <span class="fw-semibold">{{ '%.2f'|format(kpis.win_rate) }}%</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-secondary">Total P/L</span>
+            <span class="fw-semibold {% if kpis.total_pnl >= 0 %}pos{% else %}neg{% endif %}">{{ '%.2f'|format(kpis.total_pnl) }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-secondary">Avg P/L</span>
+            <span class="fw-semibold {% if kpis.avg_pl >= 0 %}pos{% else %}neg{% endif %}">{{ '%.2f'|format(kpis.avg_pl) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-8">
+      <div class="card card-glass p-3">
+        <div class="section-title mb-2">Suggestions</div>
+        <ul class="insights mb-0">
+          {% for i in insights %}
+            <li>{{ i }}</li>
+          {% endfor %}
+          {% for m in ml %}
+            <li><span class="badge text-bg-dark badge-soft me-1">ML</span> {{ m }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

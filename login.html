@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% set page_title = "Login" %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-5">
+      <div class="card card-glass p-3 p-md-4">
+        <h3 class="mb-1">Welcome back</h3>
+        <p class="text-secondary mb-4">Login to your trading dashboard.</p>
+
+        <form method="post" action="{{ url_for('auth.login_post') }}" class="stack">
+          <div>
+            <label class="form-label">Username or Email</label>
+            <input class="form-control form-control-dark" name="identifier" placeholder="demo or demo@example.com" required />
+          </div>
+          <div>
+            <label class="form-label">Password</label>
+            <input class="form-control form-control-dark" name="password" type="password" placeholder="••••••••" required />
+          </div>
+          <button class="btn btn-primary w-100 btn-trade" type="submit">Login</button>
+        </form>
+
+        <div class="mt-3 text-center text-secondary">
+          No account?
+          <a href="{{ url_for('auth.signup') }}" class="link-light">Create one</a>
+        </div>
+
+        <div class="mt-3 small text-secondary">
+          Demo login: <span class="text-light">demo</span> / <span class="text-light">demo1234</span>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

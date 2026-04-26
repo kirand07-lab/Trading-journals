@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% set page_title = "Trades" %}
+
+{% block content %}
+  <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+    <div>
+      <div class="section-title">Trade history</div>
+      <div class="text-secondary small">Search, filter, export, and manage your trades.</div>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-light btn-sm" href="{{ url_for('trades.export_csv') }}">Export CSV</a>
+      <a class="btn btn-primary btn-sm btn-trade" href="{{ url_for('trades.new_trade') }}">+ Add trade</a>
+    </div>
+  </div>
+
+  <div class="card card-glass p-3 mb-3">
+    <form class="row g-2 align-items-end" method="get" action="{{ url_for('trades.list_trades') }}">
+      <div class="col-12 col-md-3">
+        <label class="form-label">Asset</label>
+        <input class="form-control form-control-dark" name="asset" value="{{ filters.asset }}" placeholder="BTCUSDT, AAPL..." />
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label">Strategy</label>
+        <select class="form-select form-control-dark" name="strategy_id">
+          <option value="">Any</option>
+          {% for s in strategies %}
+            <option value="{{ s.id }}" {% if filters.strategy_id|int == s.id %}selected{% endif %}>{{ s.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label">Outcome</label>
+        <select class="form-select form-control-dark" name="outcome">
+          <option value="" {% if not filters.outcome %}selected{% endif %}>Any</option>
+          <option value="win" {% if filters.outcome == 'win' %}selected{% endif %}>Win</option>
+          <option value="loss" {% if filters.outcome == 'loss' %}selected{% endif %}>Loss</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label">Start (YYYY-MM-DD)</label>
+        <input class="form-control form-control-dark" name="start" value="{{ filters.start }}" placeholder="2026-01-01" />
+      </div>
+      <div class="col-12 col-md-2">
+        <label class="form-label">End (YYYY-MM-DD)</label>
+        <input class="form-control form-control-dark" name="end" value="{{ filters.end }}" placeholder="2026-12-31" />
+      </div>
+      <div class="col-12 d-flex gap-2">
+        <button class="btn btn-outline-light btn-sm" type="submit">Apply</button>
+        <a class="btn btn-link link-light btn-sm" href="{{ url_for('trades.list_trades') }}">Reset</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="card card-glass p-3">
+    <div class="table-responsive">
+      <table class="table table-dark table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Asset</th>
+            <th>Entry</th>
+            <th>Exit</th>
+            <th>Qty</th>
+            <th>Strategy</th>
+            <th>Closed</th>
+            <th class="text-end">P/L</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in trades %}
+            <tr>
+              <td>
+                <span class="chip {% if t.trade_type == 'BUY' %}chip-buy{% else %}chip-sell{% endif %}">{{ t.trade_type }}</span>
+              </td>
+              <td class="fw-semibold">{{ t.asset }}</td>
+              <td>{{ '%.2f'|format(t.entry_price) }}</td>
+              <td>{{ '%.2f'|format(t.exit_price) }}</td>
+              <td>{{ t.quantity }}</td>
+              <td class="text-secondary">{{ t.strategy_name if t.strategy_name else "—" }}</td>
+              <td class="text-secondary">{{ t.closed_at }}</td>
+              <td class="text-end {% if t.profit_loss >= 0 %}pos{% else %}neg{% endif %}">
+                {{ '%.2f'|format(t.profit_loss) }}
+              </td>
+              <td class="text-end">
+                <a class="btn btn-outline-light btn-sm" href="{{ url_for('trades.edit_trade', trade_id=t.id) }}">Edit</a>
+                <form class="d-inline" method="post" action="{{ url_for('trades.delete_trade', trade_id=t.id) }}" onsubmit="return confirm('Delete this trade?');">
+                  <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="9" class="text-center text-secondary py-4">No trades found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
+

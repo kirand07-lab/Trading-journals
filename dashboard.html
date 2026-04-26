@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% set page_title = "Dashboard" %}
+
+{% block content %}
+  <div class="row g-3">
+    <div class="col-12 col-lg-3">
+      <div class="card card-glass kpi">
+        <div class="kpi-label">Total trades</div>
+        <div class="kpi-value">{{ total_trades }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-3">
+      <div class="card card-glass kpi">
+        <div class="kpi-label">Win rate</div>
+        <div class="kpi-value">{{ '%.1f'|format(win_rate) }}%</div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-3">
+      <div class="card card-glass kpi">
+        <div class="kpi-label">Total P/L</div>
+        <div class="kpi-value {% if total_pnl >= 0 %}pos{% else %}neg{% endif %}">
+          {{ '%.2f'|format(total_pnl) }}
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-3">
+      <div class="card card-glass kpi">
+        <div class="kpi-label">Average P/L</div>
+        <div class="kpi-value {% if avg_pl >= 0 %}pos{% else %}neg{% endif %}">
+          {{ '%.2f'|format(avg_pl) }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-1">
+    <div class="col-12 col-xl-8">
+      <div class="card card-glass p-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div>
+            <div class="section-title">Profit / Loss (preview)</div>
+            <div class="text-secondary small">Charts will become fully interactive in the next step.</div>
+          </div>
+          <span class="badge text-bg-dark badge-soft">Chart.js</span>
+        </div>
+        <canvas id="pnlChart" height="120"></canvas>
+      </div>
+    </div>
+    <div class="col-12 col-xl-4">
+      <div class="card card-glass p-3 h-100">
+        <div class="section-title mb-2">AI Insights (preview)</div>
+        <ul class="insights mb-0">
+          <li>Track more trades to unlock higher-confidence insights.</li>
+          <li>Use consistent strategy names to find winners.</li>
+          <li>Avoid overtrading: keep a daily trade limit.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-1">
+    <div class="col-12">
+      <div class="card card-glass p-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div class="section-title">Recent trades</div>
+          <span class="text-secondary small">Showing latest 8</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-dark table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Asset</th>
+                <th>Entry</th>
+                <th>Exit</th>
+                <th>Qty</th>
+                <th>Strategy</th>
+                <th>Closed</th>
+                <th class="text-end">P/L</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for t in recent_trades %}
+                <tr>
+                  <td>
+                    <span class="chip {% if t.trade_type == 'BUY' %}chip-buy{% else %}chip-sell{% endif %}">{{ t.trade_type }}</span>
+                  </td>
+                  <td class="fw-semibold">{{ t.asset }}</td>
+                  <td>{{ '%.2f'|format(t.entry_price) }}</td>
+                  <td>{{ '%.2f'|format(t.exit_price) }}</td>
+                  <td>{{ t.quantity }}</td>
+                  <td class="text-secondary">{{ t.strategy_name if t.strategy_name else "—" }}</td>
+                  <td class="text-secondary">{{ t.closed_at }}</td>
+                  <td class="text-end {% if t.profit_loss >= 0 %}pos{% else %}neg{% endif %}">
+                    {{ '%.2f'|format(t.profit_loss) }}
+                  </td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="8" class="text-center text-secondary py-4">No trades yet.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}
+
